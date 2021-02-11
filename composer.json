@@ -1,0 +1,42 @@
+{
+    "name": "awisgo/laravel-seq-queue-db",
+    "type": "library",
+    "description": "Laravel subject sequence queue database",
+    "keywords": [
+        "AWIS",
+        "laravel",
+        "queue",
+        "laravel-queue",
+        "sequence-queue-database"
+    ],
+    "homepage": "https://github.com/awisgo/laravel_seq_queue_db",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "AWIS",
+            "role": "Developer"
+        }
+    ],
+    "require": {
+        "php": ">=8.0",
+        "laravel/framework": "^8.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "AWIS\\SeqQueueDB\\": "src"
+        }
+    },
+    "scripts": {
+        "test": "phpunit"
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "AWIS\\SeqQueueDB\\Providers\\LaravelServiceProvider",
+                "AWIS\\SeqQueueDB\\Providers\\RegisterFailedJobServiceProvider"
+            ]
+        }
+    },
+    "minimum-stability": "dev",
+    "prefer-stable": true
+}

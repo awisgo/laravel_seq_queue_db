@@ -1,2 +1,2 @@
-# laravel_seq_queue_db
+# laravel-seq-queue-db
 Laravel subject sequence queue database
