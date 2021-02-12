@@ -17,6 +17,19 @@ class FailedTableCommand extends \Illuminate\Queue\Console\FailedTableCommand
     protected $name = 'queue:failed-seq-table';
 
     /**
+     * Create a base migration file for the table.
+     *
+     * @param  string  $table
+     * @return string
+     */
+    protected function createBaseMigration($table = 'failed_jobs')
+    {
+        return $this->laravel['migration.creator']->create(
+            'alter_'.$table.'_table', $this->laravel->databasePath().'/migrations'
+        );
+    }
+
+    /**
      * Replace the generated migration with the failed job table stub.
      *
      * @param string $path

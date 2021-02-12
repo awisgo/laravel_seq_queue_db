@@ -3,15 +3,14 @@
 namespace AWIS\SeqQueueDB\Providers;
 
 
+use AWIS\SeqQueueDB\Console\FailedTableCommand;
+use AWIS\SeqQueueDB\Console\TableCommand;
+use AWIS\SeqQueueDB\DatabaseConnector;
+use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Queue\Queue;
 use Illuminate\Queue\QueueManager;
 use Illuminate\Support\Arr;
 use Illuminate\Support\ServiceProvider;
-use AWIS\SeqQueueDB\Console\FailedTableCommand;
-use AWIS\SeqQueueDB\Console\TableCommand;
-use AWIS\SeqQueueDB\DatabaseConnector;
-use AWIS\SeqQueueDB\SeqShouldQueue;
-use AWIS\SeqQueueDB\SeqStopQueueAfterExecute;
 
 
 /**
@@ -30,14 +29,21 @@ class LaravelServiceProvider extends ServiceProvider
     public function register() : void
     {
         Queue::createPayloadUsing(function ($connection, $queue, $payload) {
-            /** @var SeqShouldQueue|mixed $job */
+            /** @var ShouldQueue|mixed $job */
             $job = Arr::get($payload, 'data.command');
 
             return [
-                'seq_entity'  => $job instanceof SeqShouldQueue ? $job->entity() : null,
-                'seq_is_stop' => $job instanceof SeqStopQueueAfterExecute,
+                'seq_entity'  => method_exists($job, 'sequenceEntity') ? $job->sequenceEntity() : null,
+                'seq_is_stop' => method_exists($job, 'isStopQueueAfterExecute') ? $job->isStopQueueAfterExecute() : null,
             ];
         });
+
+        if ($this->app->runningInConsole()) {
+            $this->commands([
+                FailedTableCommand::class,
+                TableCommand::class,
+            ]);
+        }
     }
 
     /**
@@ -51,13 +57,6 @@ class LaravelServiceProvider extends ServiceProvider
         $manager = $this->app['queue'];
 
         $this->addSeqDatabaseConnector($manager);
-
-        if ($this->app->runningInConsole()) {
-            $this->commands([
-                FailedTableCommand::class,
-                TableCommand::class,
-            ]);
-        }
     }
 
     /**

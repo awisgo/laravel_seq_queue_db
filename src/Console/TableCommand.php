@@ -18,6 +18,19 @@ class TableCommand extends \Illuminate\Queue\Console\TableCommand
     protected $name = 'queue:seq-table';
 
     /**
+     * Create a base migration file for the table.
+     *
+     * @param  string  $table
+     * @return string
+     */
+    protected function createBaseMigration($table = 'jobs')
+    {
+        return $this->laravel['migration.creator']->create(
+            'alter_'.$table.'_table', $this->laravel->databasePath().'/migrations'
+        );
+    }
+
+    /**
      * Replace the generated migration with the job table stub.
      *
      * @param string $path

@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class Create{{tableClassName}}Table extends Migration
+class Alter{{tableClassName}}Table extends Migration
 {
     /**
      * Run the migrations.
@@ -13,16 +13,9 @@ class Create{{tableClassName}}Table extends Migration
      */
     public function up()
     {
-        Schema::create('{{table}}', function (Blueprint $table) {
-            $table->id();
-            $table->string('uuid')->unique();
-            $table->text('connection');
-            $table->text('queue');
-            $table->string('seq_entity')->nullable();
-            $table->boolean('seq_is_stop')->default(false);
-            $table->longText('payload');
-            $table->longText('exception');
-            $table->timestamp('failed_at')->useCurrent();
+        Schema::table('{{table}}', function (Blueprint $table) {
+            $table->string('seq_entity')->nullable()->index();
+            $table->boolean('seq_is_stop')->default(false)->index();
         });
     }
 
@@ -33,6 +26,9 @@ class Create{{tableClassName}}Table extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('{{table}}');
+        Schema::table('{{table}}', function (Blueprint $table) {
+            $table->dropColumn('seq_entity');
+            $table->dropColumn('seq_is_stop');
+        });
     }
 }
