@@ -34,7 +34,7 @@ class LaravelServiceProvider extends ServiceProvider
 
             return [
                 'seq_entity'  => method_exists($job, 'sequenceEntity') ? $job->sequenceEntity() : null,
-                'seq_is_stop' => method_exists($job, 'isStopQueueAfterExecute') ? $job->isStopQueueAfterExecute() : null,
+                'seq_is_stop' => method_exists($job, 'isStopQueueAfterExecute') ? $job->isStopQueueAfterExecute() : false,
             ];
         });
 
