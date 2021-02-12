@@ -18,7 +18,6 @@ class Create{{tableClassName}}Table extends Migration
             $table->string('queue')->index();
             $table->string('seq_entity')->nullable()->index();
             $table->boolean('seq_is_stop')->default(false);
-            $table->uuid('transaction_id')->nullable()->index();
             $table->longText('payload');
             $table->unsignedTinyInteger('attempts');
             $table->unsignedInteger('reserved_at')->nullable();
