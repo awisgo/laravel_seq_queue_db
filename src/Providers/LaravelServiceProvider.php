@@ -28,15 +28,9 @@ class LaravelServiceProvider extends ServiceProvider
      */
     public function register() : void
     {
-        Queue::createPayloadUsing(function ($connection, $queue, $payload) {
-            /** @var ShouldQueue|mixed $job */
-            $job = Arr::get($payload, 'data.command');
+        $this->initListenerPayloadUsing();
 
-            return [
-                'seq_entity'  => method_exists($job, 'sequenceEntity') ? $job->sequenceEntity() : null,
-                'seq_is_stop' => method_exists($job, 'isStopQueueAfterExecute') ? $job->isStopQueueAfterExecute() : false,
-            ];
-        });
+        $this->addConfig();
 
         if ($this->app->runningInConsole()) {
             $this->commands([
@@ -60,6 +54,8 @@ class LaravelServiceProvider extends ServiceProvider
     }
 
     /**
+     * Add connector in QueueManager
+     *
      * @param QueueManager $manager
      */
     protected function addSeqDatabaseConnector(QueueManager $manager) : void
@@ -67,6 +63,37 @@ class LaravelServiceProvider extends ServiceProvider
         $manager->addConnector('seq_database', function () {
             return new DatabaseConnector($this->app['db']);
         });
+    }
+
+    /**
+     * Registering a listener for the payload job creation event
+     *
+     * @return void
+     */
+    protected function initListenerPayloadUsing() : void
+    {
+        Queue::createPayloadUsing(function ($connection, $queue, $payload) {
+            /** @var ShouldQueue|mixed $job */
+            $job = Arr::get($payload, 'data.command');
+
+            return [
+                'seq_entity'  => method_exists($job, 'sequenceEntity') ? $job->sequenceEntity() : null,
+                'seq_is_stop' => method_exists($job, 'isStopQueueAfterExecute') ? $job->isStopQueueAfterExecute() : false,
+            ];
+        });
+    }
+
+    /**
+     * Merge config connector from laravel config/queue.php
+     *
+     * @return void
+     */
+    protected function addConfig() : void
+    {
+        $this->mergeConfigFrom(
+            __DIR__ . '/../config/queue.php',
+            'queue.connections'
+        );
     }
 
 }
