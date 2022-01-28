@@ -4,6 +4,7 @@ namespace AWIS\SeqQueueDB;
 
 
 use Illuminate\Database\Query\Builder;
+use Illuminate\Database\Query\Expression;
 use Illuminate\Queue\Jobs\DatabaseJobRecord;
 use Illuminate\Support\Arr;
 
@@ -70,8 +71,8 @@ class DatabaseQueue extends \Illuminate\Queue\DatabaseQueue
                     $this->isNotExistFeildJob($query);
                 });
             })
-            ->orderBy('available_at', 'asc')
-            ->orderBy('id', 'asc')
+            ->oldest('available_at')
+            ->oldest('id')
             ->first();
 
         return $job ? new DatabaseJobRecord((object) $job) : null;
@@ -82,11 +83,11 @@ class DatabaseQueue extends \Illuminate\Queue\DatabaseQueue
      */
     protected function isNotExistSeqJob(Builder $query) : void
     {
-        $query->whereNotExists(function (Builder $query) {
-            $query->from('jobs', 'jobs2')
-                ->whereColumn('jobs.seq_entity', 'jobs2.seq_entity')
-                ->whereNotNull('jobs2.reserved_at');
-        });
+        $query->whereRaw("(
+            SELECT count(jobs2.id) < 1
+            FROM jobs as jobs2
+            WHERE jobs.seq_entity = jobs2.seq_entity AND jobs2.reserved_at IS NOT NULL
+        )");
     }
 
     /**
@@ -97,7 +98,7 @@ class DatabaseQueue extends \Illuminate\Queue\DatabaseQueue
         $query->whereNotExists(function (Builder $query) {
             $query->from('failed_jobs')
                 ->whereColumn('jobs.seq_entity', 'failed_jobs.seq_entity')
-                ->where('failed_jobs.seq_is_stop', '=', true);
+                ->where('failed_jobs.seq_is_stop', '=', new Expression('true'));
         });
     }
 
