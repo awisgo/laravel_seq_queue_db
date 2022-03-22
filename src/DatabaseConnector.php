@@ -21,11 +21,11 @@ class DatabaseConnector extends \Illuminate\Queue\Connectors\DatabaseConnector
     public function connect(array $config)
     {
         return new DatabaseQueue(
-            $this->connections->connection($config['connection'] ?? null),
+            $this->connections->connection($config['connection']),
             $config['table'],
             $config['queue'],
             $config['retry_after'] ?? 60,
-            $config['after_commit'] ?? null
+            $config['after_commit'] ?? false
         );
     }
 

@@ -35,16 +35,13 @@ class TableCommand extends \Illuminate\Queue\Console\TableCommand
      *
      * @param string $path
      * @param string $table
-     * @param string $tableClassName
      *
      * @return void
      */
-    protected function replaceMigration($path, $table, $tableClassName)
+    protected function replaceMigration($path, $table)
     {
         $stub = str_replace(
-            ['{{table}}', '{{tableClassName}}'],
-            [$table, $tableClassName],
-            $this->files->get(__DIR__ . '/stubs/jobs.stub')
+            '{{table}}', $table, $this->files->get(__DIR__.'/stubs/jobs.stub')
         );
 
         $this->files->put($path, $stub);
