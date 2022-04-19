@@ -16,7 +16,7 @@ return [
     */
 
     'seq_database' => [
-        'driver'      => 'seq_database',
+        'driver'      => 'database',
         'table'       => 'jobs',
         'queue'       => 'default',
         'retry_after' => 90,
